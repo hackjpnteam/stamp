@@ -1,6 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 import { Session } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
 import { dbConnect } from '@/lib/mongoose'
 import { User } from '@/models/User'
 import { validateEnvironmentVariables } from '@/lib/env-check'
@@ -41,6 +42,21 @@ declare module 'next-auth/jwt' {
 export const authOptions: NextAuthOptions = {
   debug: true, // 本番環境でもデバッグログを有効化
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        console.log('🎯 Google Profile received:', JSON.stringify(profile, null, 2))
+        const user = {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        }
+        console.log('🎯 Google mapped user object:', JSON.stringify(user, null, 2))
+        return user
+      },
+    }),
     {
       id: 'line',
       name: 'LINE',
@@ -84,17 +100,26 @@ export const authOptions: NextAuthOptions = {
       console.log('🔐 Full account object:', JSON.stringify(account, null, 2))
       console.log('🔐 Full profile object:', JSON.stringify(profile, null, 2))
       
-      // 重要: 必ずtrueを返すようにして、エラーの原因を特定
-      if (account?.provider === 'line') {
+      // Google または LINE プロバイダーの場合
+      if (account?.provider === 'google' || account?.provider === 'line') {
         try {
           console.log('🔐 Attempting DB connection...')
           const connection = await dbConnect()
           console.log('🔐 DB connection result:', !!connection)
           
-          const email = user.email || `${profile?.sub || account.providerAccountId}@line.local`
-          const name = user.name || 'LINE User'
+          let email: string
+          let name: string
           
-          console.log('🔐 Creating/updating user with:', { email, name })
+          if (account.provider === 'google') {
+            email = user.email || profile?.email || `${profile?.sub}@gmail.com`
+            name = user.name || profile?.name || 'Google User'
+          } else {
+            // LINE provider
+            email = user.email || `${profile?.sub || account.providerAccountId}@line.local`
+            name = user.name || 'LINE User'
+          }
+          
+          console.log('🔐 Creating/updating user with:', { email, name, provider: account.provider })
           
           const result = await User.findOneAndUpdate(
             { email },
@@ -107,7 +132,7 @@ export const authOptions: NextAuthOptions = {
           )
           
           console.log('🔐 User save result:', result ? 'SUCCESS' : 'FAILED')
-          console.log('🔐 SignIn callback returning TRUE (forced)')
+          console.log('🔐 SignIn callback returning TRUE')
           
           return true
         } catch (error) {
@@ -149,9 +174,16 @@ export const authOptions: NextAuthOptions = {
       return baseUrl + '/auth'
     },
     async jwt({ token, account, profile }) {
-      if (account?.provider === 'line') {
+      if (account?.provider === 'google' || account?.provider === 'line') {
         await dbConnect()
-        const email = `${profile?.sub || account.providerAccountId}@line.local`
+        
+        let email: string
+        if (account.provider === 'google') {
+          email = token.email || profile?.email || `${profile?.sub}@gmail.com`
+        } else {
+          email = `${profile?.sub || account.providerAccountId}@line.local`
+        }
+        
         const dbUser = await User.findOne({ email })
         
         if (dbUser) {
