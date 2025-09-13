@@ -27,7 +27,7 @@ export default function AuthButtons() {
 
   return (
     <button
-      onClick={() => signIn('line')}
+      onClick={() => signIn('line', { callbackUrl: '/auth' })}
       className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center gap-2"
     >
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

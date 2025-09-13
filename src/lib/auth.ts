@@ -78,6 +78,24 @@ export const authOptions: NextAuthOptions = {
       }
       return true
     },
+    async redirect({ url, baseUrl }) {
+      // ログイン後のリダイレクト先を決定
+      console.log('NextAuth redirect callback:', { url, baseUrl })
+      
+      // URLがコールバックURLの場合
+      if (url.startsWith(baseUrl + '/api/auth/callback')) {
+        // デフォルトでマイページ(/auth)にリダイレクト
+        return baseUrl + '/auth'
+      }
+      
+      // 既に指定されたコールバックURLがある場合はそれを使用
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      
+      // 外部URLの場合はベースURLにリダイレクト
+      return baseUrl + '/auth'
+    },
     async jwt({ token, account, profile }) {
       if (account?.provider === 'line') {
         await dbConnect()
