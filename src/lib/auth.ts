@@ -84,6 +84,7 @@ export const authOptions: NextAuthOptions = {
       console.log('🔐 Full account object:', JSON.stringify(account, null, 2))
       console.log('🔐 Full profile object:', JSON.stringify(profile, null, 2))
       
+      // 重要: 必ずtrueを返すようにして、エラーの原因を特定
       if (account?.provider === 'line') {
         try {
           console.log('🔐 Attempting DB connection...')
@@ -106,11 +107,13 @@ export const authOptions: NextAuthOptions = {
           )
           
           console.log('🔐 User save result:', result ? 'SUCCESS' : 'FAILED')
+          console.log('🔐 SignIn callback returning TRUE (forced)')
           
           return true
         } catch (error) {
-          console.error('🚨 SignIn error:', error)
-          return false
+          console.error('🚨 SignIn error, but returning TRUE to continue auth flow:', error)
+          // デバッグのためエラーでもtrueを返す
+          return true
         }
       }
       console.log('🔐 Non-LINE provider, returning true')
@@ -199,5 +202,17 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
+  },
+  logger: {
+    error(code, metadata) {
+      console.error('🚨 NextAuth Error Code:', code)
+      console.error('🚨 NextAuth Error Metadata:', JSON.stringify(metadata, null, 2))
+    },
+    warn(code) {
+      console.warn('⚠️ NextAuth Warning:', code)
+    },
+    debug(code, metadata) {
+      console.log('🐛 NextAuth Debug:', code, metadata)
+    }
   },
 }
