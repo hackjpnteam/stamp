@@ -166,33 +166,6 @@ export default function AuthPage() {
                       </div>
                     </div>
 
-                    {/* マイルストーン表示 */}
-                    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-white text-sm font-bold">✓</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">25</div>
-                      </div>
-                    </div>
-                    
-                    <div className="absolute top-1/2 -right-2 transform translate-x-1/2 -translate-y-1/2">
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-gray-600 text-sm">○</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">50</div>
-                      </div>
-                    </div>
-                    
-                    <div className="absolute bottom-6 right-6">
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-gray-600 text-sm">○</span>
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">75</div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
