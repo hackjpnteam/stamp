@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { dbConnect } from '@/lib/mongoose'
 import { User } from '@/models/User'
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)

@@ -5,6 +5,9 @@ import { dbConnect } from '@/lib/mongoose'
 import { Attendance } from '@/models/Attendance'
 import { demoAttendances } from '@/lib/demo-data'
 
+// Force dynamic rendering for authenticated routes
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
