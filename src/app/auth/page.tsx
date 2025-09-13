@@ -270,9 +270,6 @@ export default function AuthPage() {
                         </div>
                       </div>
                     </div>
-                    <button className="px-3 py-1 text-xs bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
-                      プロフィール
-                    </button>
                   </div>
                 ))}
               </div>
