@@ -49,6 +49,9 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([])
   const [loginHistory, setLoginHistory] = useState<any[]>([])
   const [showLoginHistory, setShowLoginHistory] = useState(false)
+  
+  // Database reset state
+  const [isResetting, setIsResetting] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') {
@@ -221,6 +224,58 @@ export default function AdminPage() {
     }
   }
 
+  const resetDatabase = async () => {
+    const confirmed = confirm(
+      '⚠️ 警告: データベースを完全にリセットします\n\n' +
+      '• 全ユーザーデータ（管理者以外）\n' +
+      '• 全イベントデータ\n' +
+      '• 全参加記録データ\n\n' +
+      'この操作は取り消しできません。本当に実行しますか？'
+    )
+    
+    if (!confirmed) return
+
+    const doubleConfirm = prompt(
+      'データベースリセットを実行するには「RESET」と入力してください:'
+    )
+    
+    if (doubleConfirm !== 'RESET') {
+      alert('キャンセルされました')
+      return
+    }
+
+    setIsResetting(true)
+    
+    try {
+      const res = await fetch('/api/admin/reset-database', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        alert(
+          '✅ データベースリセット完了\n\n' +
+          `削除されたデータ:\n` +
+          `• ユーザー: ${data.deletedCounts.users}件\n` +
+          `• イベント: ${data.deletedCounts.events}件\n` +
+          `• 参加記録: ${data.deletedCounts.attendances}件\n\n` +
+          '管理者ユーザーは再作成されました。\nページを更新します。'
+        )
+        // データを再読み込み
+        fetchData()
+      } else {
+        alert(`❌ リセット失敗: ${data.error}`)
+      }
+    } catch (error) {
+      alert('❌ リセット処理でエラーが発生しました')
+      console.error('Database reset error:', error)
+    } finally {
+      setIsResetting(false)
+    }
+  }
+
   if (status === 'loading') {
     return (
       <main className="min-h-screen bg-gradient-to-br from-purple-50 to-red-50 pt-16">
@@ -345,7 +400,7 @@ export default function AdminPage() {
                   <p className="text-purple-200 text-sm">朝から始まる物語 - イベント・統計・システム管理</p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="flex flex-col gap-2 text-right">
                 <Link 
                   href="/"
                   className="inline-flex items-center gap-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition text-sm"
@@ -353,6 +408,14 @@ export default function AdminPage() {
                   <span>🏠</span>
                   <span>ホームへ</span>
                 </Link>
+                <button
+                  onClick={resetDatabase}
+                  disabled={isResetting}
+                  className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-red-300 px-4 py-2 rounded-lg transition text-sm text-white"
+                >
+                  <span>🗑️</span>
+                  <span>{isResetting ? 'リセット中...' : 'DB リセット'}</span>
+                </button>
               </div>
             </div>
           </div>
