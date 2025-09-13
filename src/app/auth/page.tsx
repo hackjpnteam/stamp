@@ -90,7 +90,11 @@ export default function AuthPage() {
                     </h2>
                     <p className="text-gray-300 text-sm flex items-center gap-2">
                       <span>🏃</span>
-                      <span>ラジオ体操メンバー</span>
+                      <span>
+                        {(session.user as any)?.role === 'owner' ? '👑 システム管理者' :
+                         (session.user as any)?.role === 'admin' ? '🛠️ 管理者' : 
+                         'ラジオ体操メンバー'}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -294,6 +298,15 @@ export default function AuthPage() {
               >
                 🏆 ランキングを見る
               </Link>
+              {/* 管理者のみ表示 */}
+              {(session.user as any)?.role === 'admin' || (session.user as any)?.role === 'owner' ? (
+                <Link
+                  href="/admin"
+                  className="p-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-center md:col-span-2"
+                >
+                  👑 管理者ページ
+                </Link>
+              ) : null}
             </div>
 
             {/* 最近の参加履歴 */}
