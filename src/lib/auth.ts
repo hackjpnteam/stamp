@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions = {
         const dbUser = await User.findOne({ email })
         
         if (dbUser) {
-          token.id = dbUser._id.toString()
+          token.id = (dbUser._id as any).toString()
           token.role = dbUser.role
           token.sub = profile?.sub || account.providerAccountId
         }

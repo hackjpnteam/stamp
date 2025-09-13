@@ -371,9 +371,9 @@ export default function EventList() {
                         return (
                           <div key={reg._id} className="flex items-center justify-center gap-2 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
                             <Link href={`/profile/${reg.userId}`} className="flex-shrink-0">
-                              {isCurrentUser && session?.user?.image ? (
+                              {isCurrentUser && (session?.user as any)?.image ? (
                                 <img 
-                                  src={session.user.image} 
+                                  src={(session?.user as any)?.image} 
                                   alt={reg.userName}
                                   className="w-5 h-5 rounded-full object-cover hover:ring-2 hover:ring-blue-500 transition cursor-pointer"
                                 />

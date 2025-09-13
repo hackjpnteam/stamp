@@ -167,7 +167,7 @@ export default function UserProfilePage() {
             <RainbowFrame background="white" className="mb-6">
               <h2 className="text-lg font-bold text-gray-800 mb-4">🏆 獲得バッジ</h2>
               <div className="flex flex-wrap gap-2">
-                {userProfile.badges.map((badge, index) => (
+                {userProfile.badges.map((badge: string, index: number) => (
                   <span 
                     key={index}
                     className="px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full text-sm font-semibold"

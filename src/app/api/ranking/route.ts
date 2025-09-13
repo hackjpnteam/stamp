@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     // ランキングデータを作成
     const ranking = attendanceStats.map((stat, index) => {
-      const user = users.find(u => u._id.toString() === stat._id.toString())
+      const user = users.find(u => (u._id as any).toString() === stat._id.toString())
       return {
         userId: stat._id,
         name: user?.name || 'Unknown',

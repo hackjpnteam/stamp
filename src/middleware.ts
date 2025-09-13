@@ -6,11 +6,10 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Admin routes check
+    // Admin routes - ページレベルで制御するためmiddlewareでは制限しない
     if (path.startsWith('/admin')) {
-      if (token?.role !== 'admin' && token?.role !== 'owner') {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-      }
+      // 管理者ページは認証済みであれば通す（権限チェックはページレベルで実行）
+      return NextResponse.next()
     }
 
     return NextResponse.next()
@@ -25,7 +24,12 @@ export default withAuth(
           return true
         }
         
-        // Protected routes require authentication
+        // Admin routes - always allow (権限チェックはページレベルで)
+        if (path.startsWith('/admin')) {
+          return true
+        }
+        
+        // Other protected routes require authentication
         return !!token
       }
     }

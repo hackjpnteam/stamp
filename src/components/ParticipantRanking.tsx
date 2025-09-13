@@ -91,9 +91,9 @@ export default function ParticipantRanking() {
                 
                 <div className="flex items-center gap-2 flex-1">
                   <Link href={`/profile/${user.userId}`} className="flex-shrink-0">
-                    {session?.user?.image && user.userId === (session.user.id || 'demo-user-1') ? (
+                    {(session?.user as any)?.image && user.userId === (session?.user.id || 'demo-user-1') ? (
                       <img 
-                        src={session.user.image} 
+                        src={(session?.user as any)?.image} 
                         alt={user.name}
                         className="w-6 h-6 rounded-full object-cover hover:ring-2 hover:ring-blue-500 transition cursor-pointer"
                       />
@@ -123,10 +123,10 @@ export default function ParticipantRanking() {
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-2">あなたのランキング</p>
                 <div className="flex items-center justify-center gap-2 p-2 bg-blue-100 rounded-lg">
-                  {session?.user?.image ? (
+                  {(session?.user as any)?.image ? (
                     <img 
-                      src={session.user.image} 
-                      alt={session.user.name || 'ユーザー'}
+                      src={(session?.user as any)?.image} 
+                      alt={session?.user?.name || 'ユーザー'}
                       className="w-5 h-5 rounded-full object-cover"
                     />
                   ) : (

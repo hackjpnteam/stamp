@@ -121,9 +121,9 @@ export default function RecentUsers() {
               return (
                 <div key={user.userId + '-' + index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <Link href={`/profile/${user.userId}`} className="flex-shrink-0">
-                    {isCurrentUser && session?.user?.image ? (
+                    {isCurrentUser && (session?.user as any)?.image ? (
                       <img 
-                        src={session.user.image} 
+                        src={(session?.user as any)?.image} 
                         alt={user.name}
                         className="w-8 h-8 rounded-full object-cover hover:ring-2 hover:ring-blue-500 transition cursor-pointer"
                       />

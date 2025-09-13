@@ -59,7 +59,9 @@ export async function GET(req: NextRequest) {
 
     // Find perfect attendance users
     const perfectAttendanceUsers: any[] = []
-    for (const [userId, count] of userAttendanceMap.entries()) {
+    const userIds = Array.from(userAttendanceMap.keys())
+    for (const userId of userIds) {
+      const count = userAttendanceMap.get(userId)
       if (count === totalDays) {
         const user = await User.findById(userId)
         if (user) {

@@ -58,7 +58,7 @@ export async function GET(
       userProfile = {
         id: userId,
         name: session.user.name || 'ユーザー',
-        image: session.user.image || null,
+        image: (session.user as any).image || null,
         profileText: 'ラジオ体操を通じて健康的な生活を心がけています。毎朝6時から参加して、みんなと一緒に体を動かすのが日課です！',
         level: '健康マスター',
         participationCount: 32,

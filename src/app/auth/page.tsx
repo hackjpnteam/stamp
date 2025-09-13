@@ -73,9 +73,9 @@ export default function AuthPage() {
             <div className="bg-gradient-to-r from-gray-700 to-gray-600 text-white p-6 rounded-t-2xl mb-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  {session.user?.image ? (
+                  {(session.user as any)?.image ? (
                     <img 
-                      src={session.user.image} 
+                      src={(session.user as any).image} 
                       alt={session.user.name || 'ユーザー'}
                       className="w-12 h-12 rounded-full object-cover"
                     />
