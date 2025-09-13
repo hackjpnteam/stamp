@@ -29,9 +29,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ groups: demoGroups })
     }
 
-    if (session.user.role !== 'admin' && session.user.role !== 'owner') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    // 誰でもグループ表示可能にする（権限チェックを削除）
 
     const groups = await Group.find({})
       .select('name code owner')
@@ -76,9 +74,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ group: newGroup }, { status: 201 })
     }
 
-    if (session.user.role !== 'admin' && session.user.role !== 'owner') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    // 誰でもグループ作成可能にする（権限チェックを削除）
 
     const group = await Group.create({
       name,
