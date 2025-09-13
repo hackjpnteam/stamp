@@ -2,9 +2,12 @@
 
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 
-export default function ErrorPage() {
+// Dynamic rendering required due to useSearchParams
+export const dynamic = 'force-dynamic'
+
+function ErrorPageContent() {
   const searchParams = useSearchParams()
   const [debugInfo, setDebugInfo] = useState<any>(null)
   
@@ -197,5 +200,26 @@ export default function ErrorPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function ErrorPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 pt-16">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="text-center">
+                <div className="text-6xl mb-4">⚠️</div>
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">読み込み中...</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    }>
+      <ErrorPageContent />
+    </Suspense>
   )
 }

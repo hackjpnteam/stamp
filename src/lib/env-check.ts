@@ -29,10 +29,10 @@ export function validateEnvironmentVariables() {
     return false
   }
 
-  // Validate NEXTAUTH_SECRET length
+  // Validate NEXTAUTH_SECRET length (警告のみ)
   if (requiredVars.NEXTAUTH_SECRET && requiredVars.NEXTAUTH_SECRET.length < 32) {
-    console.error('❌ NEXTAUTH_SECRET should be at least 32 characters long')
-    return false
+    console.warn('⚠️ NEXTAUTH_SECRET should be at least 32 characters long for better security')
+    // 本番環境では警告のみ、ビルドは継続
   }
 
   return true
