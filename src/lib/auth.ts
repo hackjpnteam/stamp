@@ -3,6 +3,10 @@ import { JWT } from 'next-auth/jwt'
 import { Session } from 'next-auth'
 import { dbConnect } from '@/lib/mongoose'
 import { User } from '@/models/User'
+import { validateEnvironmentVariables } from '@/lib/env-check'
+
+// Validate environment variables on import
+validateEnvironmentVariables()
 
 declare module 'next-auth' {
   interface Session {
@@ -25,6 +29,7 @@ declare module 'next-auth/jwt' {
 }
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     {
       id: 'line',
@@ -40,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       token: 'https://api.line.me/oauth2/v2.1/token',
       userinfo: 'https://api.line.me/v2/profile',
       profile(profile) {
+        console.log('LINE Profile received:', profile)
         return {
           id: profile.userId,
           name: profile.displayName,
@@ -98,6 +104,11 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/',
     error: '/',
+  },
+  events: {
+    error: async (message) => {
+      console.error('NextAuth Error:', message)
+    },
   },
   session: {
     strategy: 'jwt',
