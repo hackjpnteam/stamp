@@ -156,11 +156,11 @@ export const authOptions: NextAuthOptions = {
     signIn: '/',
     error: '/error',
   },
-  events: {
-    error: async (message) => {
-      console.error('NextAuth Error:', message)
-    },
-  },
+  // events: {
+  //   error: async (message) => {
+  //     console.error('NextAuth Error:', message)
+  //   },
+  // },
   session: {
     strategy: 'jwt',
   },
