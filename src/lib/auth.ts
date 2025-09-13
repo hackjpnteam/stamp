@@ -121,12 +121,21 @@ export const authOptions: NextAuthOptions = {
           
           console.log('🔐 Creating/updating user with:', { email, name, provider: account.provider })
           
+          // データベース内のユーザー数をチェック（初回ユーザーを管理者に）
+          const userCount = await User.countDocuments({})
+          const isFirstUser = userCount === 0
+          
+          console.log('🔐 User count check:', { userCount, isFirstUser })
+          
           const result = await User.findOneAndUpdate(
             { email },
             { 
               name,
               email,
-              $setOnInsert: { role: 'member', groups: [] }
+              $setOnInsert: { 
+                role: isFirstUser ? 'owner' : 'member', 
+                groups: [] 
+              }
             },
             { upsert: true, new: true }
           )
