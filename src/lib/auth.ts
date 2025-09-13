@@ -67,21 +67,36 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
+      console.log('SignIn callback triggered:', { 
+        provider: account?.provider,
+        userId: user?.id,
+        profileSub: profile?.sub 
+      })
+      
       if (account?.provider === 'line') {
-        await dbConnect()
-        
-        const email = user.email || `${profile?.sub || account.providerAccountId}@line.local`
-        const name = user.name || 'LINE User'
-        
-        await User.findOneAndUpdate(
-          { email },
-          { 
-            name,
-            email,
-            $setOnInsert: { role: 'member', groups: [] }
-          },
-          { upsert: true, new: true }
-        )
+        try {
+          await dbConnect()
+          
+          const email = user.email || `${profile?.sub || account.providerAccountId}@line.local`
+          const name = user.name || 'LINE User'
+          
+          console.log('Creating/updating user:', { email, name })
+          
+          await User.findOneAndUpdate(
+            { email },
+            { 
+              name,
+              email,
+              $setOnInsert: { role: 'member', groups: [] }
+            },
+            { upsert: true, new: true }
+          )
+          
+          return true
+        } catch (error) {
+          console.error('SignIn error:', error)
+          return false
+        }
       }
       return true
     },
@@ -89,9 +104,20 @@ export const authOptions: NextAuthOptions = {
       // ログイン後のリダイレクト先を決定
       console.log('NextAuth redirect callback:', { url, baseUrl })
       
+      // エラーの場合はエラーページへ
+      if (url.includes('error=')) {
+        return '/error' + url.substring(url.indexOf('?'))
+      }
+      
       // URLがコールバックURLの場合
       if (url.startsWith(baseUrl + '/api/auth/callback')) {
         // デフォルトでマイページ(/auth)にリダイレクト
+        return baseUrl + '/auth'
+      }
+      
+      // callbackUrlパラメータの無限ループを防ぐ
+      if (url.includes('callbackUrl=')) {
+        // callbackUrlを除去してクリーンなURLに
         return baseUrl + '/auth'
       }
       
