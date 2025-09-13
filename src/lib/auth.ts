@@ -121,24 +121,39 @@ export const authOptions: NextAuthOptions = {
           
           console.log('🔐 Creating/updating user with:', { email, name, provider: account.provider })
           
-          // データベース内のユーザー数をチェック（初回ユーザーを管理者に）
+          // 管理者メールアドレスリスト
+          const adminEmails = [
+            'tomura@hackjpn.com'
+          ]
+          
+          // データベース内のユーザー数をチェック（初回ユーザーまたは指定メールアドレスを管理者に）
           const userCount = await User.countDocuments({})
           const isFirstUser = userCount === 0
+          const isAdminEmail = adminEmails.includes(email.toLowerCase())
           
-          console.log('🔐 User count check:', { userCount, isFirstUser })
+          console.log('🔐 User count and admin check:', { 
+            userCount, 
+            isFirstUser, 
+            email, 
+            isAdminEmail 
+          })
+          
+          const assignedRole = isFirstUser || isAdminEmail ? 'owner' : 'member'
           
           const result = await User.findOneAndUpdate(
             { email },
             { 
               name,
               email,
+              role: assignedRole,
               $setOnInsert: { 
-                role: isFirstUser ? 'owner' : 'member', 
                 groups: [] 
               }
             },
             { upsert: true, new: true }
           )
+          
+          console.log('🔐 Assigned role:', { email, assignedRole, actualRole: result?.role })
           
           console.log('🔐 User save result:', result ? 'SUCCESS' : 'FAILED')
           console.log('🔐 SignIn callback returning TRUE')
