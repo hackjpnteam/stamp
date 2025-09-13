@@ -10,9 +10,12 @@ import { getAuthUrl } from '@/lib/auth-config'
 validateEnvironmentVariables()
 
 // Vercel環境での動的URL設定
-if (process.env.VERCEL && !process.env.NEXTAUTH_URL) {
-  process.env.NEXTAUTH_URL = getAuthUrl()
-  console.log('Auto-configured NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
+if (process.env.VERCEL) {
+  process.env.NEXTAUTH_URL = 'https://stamp-omega.vercel.app'
+  console.log('Force-configured NEXTAUTH_URL for Vercel:', process.env.NEXTAUTH_URL)
+} else if (!process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = 'http://localhost:3001'
+  console.log('Auto-configured NEXTAUTH_URL for development:', process.env.NEXTAUTH_URL)
 }
 
 declare module 'next-auth' {
@@ -42,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       id: 'line',
       name: 'LINE',
       type: 'oauth',
+      issuer: 'https://access.line.me',
       authorization: {
         url: 'https://access.line.me/oauth2/v2.1/authorize',
         params: {
@@ -65,10 +69,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.LINE_CLIENT_ID!,
       clientSecret: process.env.LINE_CLIENT_SECRET!,
       checks: ['state'],
-      // Vercel環境でのコールバック URL
-      redirectUri: process.env.VERCEL 
-        ? 'https://stamp-omega.vercel.app/api/auth/callback/line'
-        : 'http://localhost:3001/api/auth/callback/line',
     },
   ],
   callbacks: {
