@@ -40,7 +40,7 @@ async function seed() {
     console.log('Created group')
 
     // Update owner with group
-    owner.groups = [group._id]
+    owner.groups = [new mongoose.Types.ObjectId(group._id as string)]
     await owner.save()
 
     // Create event
@@ -98,19 +98,19 @@ async function seed() {
         name: '田中太郎',
         email: 'tanaka@example.com',
         role: 'member',
-        groups: [group._id]
+        groups: [new mongoose.Types.ObjectId(group._id as string)]
       },
       {
         name: '鈴木花子',
         email: 'suzuki@example.com',
         role: 'member',
-        groups: [group._id]
+        groups: [new mongoose.Types.ObjectId(group._id as string)]
       },
       {
         name: '佐藤次郎',
         email: 'sato@example.com',
         role: 'admin',
-        groups: [group._id]
+        groups: [new mongoose.Types.ObjectId(group._id as string)]
       }
     ])
     console.log('Created sample members')
