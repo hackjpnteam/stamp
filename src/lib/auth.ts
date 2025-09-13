@@ -36,7 +36,7 @@ declare module 'next-auth/jwt' {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: process.env.NODE_ENV === 'development',
+  debug: true, // 本番環境でもデバッグログを有効化
   providers: [
     {
       id: 'line',
@@ -52,13 +52,15 @@ export const authOptions: NextAuthOptions = {
       token: 'https://api.line.me/oauth2/v2.1/token',
       userinfo: 'https://api.line.me/v2/profile',
       profile(profile) {
-        console.log('LINE Profile received:', profile)
-        return {
+        console.log('🎯 LINE Profile received:', JSON.stringify(profile, null, 2))
+        const user = {
           id: profile.userId,
           name: profile.displayName,
           email: `${profile.userId}@line.local`,
           image: profile.pictureUrl,
         }
+        console.log('🎯 Mapped user object:', JSON.stringify(user, null, 2))
+        return user
       },
       clientId: process.env.LINE_CLIENT_ID!,
       clientSecret: process.env.LINE_CLIENT_SECRET!,
@@ -71,22 +73,29 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log('SignIn callback triggered:', { 
+      console.log('🔐 SignIn callback triggered:', { 
         provider: account?.provider,
         userId: user?.id,
-        profileSub: profile?.sub 
+        email: user?.email,
+        profileSub: profile?.sub,
+        accountProviderAccountId: account?.providerAccountId
       })
+      console.log('🔐 Full user object:', JSON.stringify(user, null, 2))
+      console.log('🔐 Full account object:', JSON.stringify(account, null, 2))
+      console.log('🔐 Full profile object:', JSON.stringify(profile, null, 2))
       
       if (account?.provider === 'line') {
         try {
-          await dbConnect()
+          console.log('🔐 Attempting DB connection...')
+          const connection = await dbConnect()
+          console.log('🔐 DB connection result:', !!connection)
           
           const email = user.email || `${profile?.sub || account.providerAccountId}@line.local`
           const name = user.name || 'LINE User'
           
-          console.log('Creating/updating user:', { email, name })
+          console.log('🔐 Creating/updating user with:', { email, name })
           
-          await User.findOneAndUpdate(
+          const result = await User.findOneAndUpdate(
             { email },
             { 
               name,
@@ -96,12 +105,15 @@ export const authOptions: NextAuthOptions = {
             { upsert: true, new: true }
           )
           
+          console.log('🔐 User save result:', result ? 'SUCCESS' : 'FAILED')
+          
           return true
         } catch (error) {
-          console.error('SignIn error:', error)
+          console.error('🚨 SignIn error:', error)
           return false
         }
       }
+      console.log('🔐 Non-LINE provider, returning true')
       return true
     },
     async redirect({ url, baseUrl }) {
@@ -160,11 +172,31 @@ export const authOptions: NextAuthOptions = {
     signIn: '/',
     error: '/error',
   },
-  // events: {
-  //   error: async (message) => {
-  //     console.error('NextAuth Error:', message)
-  //   },
-  // },
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log('🚀 NextAuth SignIn Event:', { 
+        provider: account?.provider,
+        userId: user?.id,
+        email: user?.email,
+        isNewUser 
+      })
+    },
+    async signOut({ session, token }) {
+      console.log('👋 NextAuth SignOut Event:', { sessionId: session?.user?.id })
+    },
+    async createUser({ user }) {
+      console.log('👤 NextAuth CreateUser Event:', { userId: user.id, email: user.email })
+    },
+    async session({ session, token }) {
+      console.log('🎫 NextAuth Session Event:', { userId: session?.user?.id })
+    },
+    async linkAccount({ user, account, profile }) {
+      console.log('🔗 NextAuth LinkAccount Event:', { 
+        provider: account.provider,
+        userId: user.id 
+      })
+    }
+  },
   session: {
     strategy: 'jwt',
   },
