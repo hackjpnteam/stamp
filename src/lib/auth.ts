@@ -63,6 +63,10 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.LINE_CLIENT_ID!,
       clientSecret: process.env.LINE_CLIENT_SECRET!,
       checks: ['state'],
+      // Vercel環境でのコールバック URL
+      redirectUri: process.env.VERCEL 
+        ? 'https://stamp-omega.vercel.app/api/auth/callback/line'
+        : 'http://localhost:3001/api/auth/callback/line',
     },
   ],
   callbacks: {
