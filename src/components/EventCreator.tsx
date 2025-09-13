@@ -48,8 +48,8 @@ export default function EventCreator() {
     }
   }, [])
 
-  const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'owner' || 
-                  demoSession?.user?.role === 'admin' || demoSession?.user?.role === 'owner'
+  // 誰でもイベント作成可能にする
+  const isAdmin = true
   
   console.log('Session:', session)
   console.log('Demo Session:', demoSession)
@@ -229,8 +229,8 @@ export default function EventCreator() {
     }
   }
 
-  // 管理者でない場合は何も表示しない
-  if (!isAdmin) {
+  // ログインしていない場合のみ非表示
+  if (!session && !demoSession) {
     return null
   }
 
@@ -398,7 +398,7 @@ export default function EventCreator() {
                   type="date"
                   value={eventForm.eventDate}
                   onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
-                  min={new Date().toISOString().split('T')[0]}
+                  // 過去日付も許可（min制限を削除）
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 />

@@ -90,9 +90,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ event: newEvent }, { status: 201 })
     }
 
-    if (session.user.role !== 'admin' && session.user.role !== 'owner') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    // 誰でもイベント作成可能にする（権限チェックを削除）
 
     const event = await Event.create({
       title,
