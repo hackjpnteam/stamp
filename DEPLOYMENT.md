@@ -2,9 +2,11 @@
 
 ## 必要な環境変数（Vercelダッシュボードで設定）
 
-### 1. NEXTAUTH_URL
+### 1. NEXTAUTH_URL（オプション - 自動設定可能）
 ```
-NEXTAUTH_URL=https://your-app-name.vercel.app
+# Vercelは自動的にVERCEL_URLを提供するため、明示的な設定は不要
+# カスタムドメインを使用する場合のみ設定:
+NEXTAUTH_URL=https://your-custom-domain.com
 ```
 
 ### 2. NEXTAUTH_SECRET

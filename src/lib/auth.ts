@@ -4,9 +4,16 @@ import { Session } from 'next-auth'
 import { dbConnect } from '@/lib/mongoose'
 import { User } from '@/models/User'
 import { validateEnvironmentVariables } from '@/lib/env-check'
+import { getAuthUrl } from '@/lib/auth-config'
 
 // Validate environment variables on import
 validateEnvironmentVariables()
+
+// Vercel環境での動的URL設定
+if (process.env.VERCEL && !process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = getAuthUrl()
+  console.log('Auto-configured NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
+}
 
 declare module 'next-auth' {
   interface Session {
@@ -121,7 +128,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/',
-    error: '/',
+    error: '/error',
   },
   events: {
     error: async (message) => {
